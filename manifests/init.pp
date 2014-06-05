@@ -8,7 +8,7 @@ class linux_postinstall(
 ) {
 
   $path = "${vardir}/staging:${vardir}/staging/${file}:${::path}"
-  $vardir  = $::puppet_vardir,
+  $vardir = $::puppet_vardir
 
   if $install_packages {
     $packages = split($install_packages, ',')
@@ -18,17 +18,17 @@ class linux_postinstall(
     }
   }
 
-  if $file {
+  if $upload_file {
     $staging = "${vardir}/staging"
     file { $staging:
       ensure => directory,
       mode   => 755,
     }
 
-    file { "${staging}/${file}":
+    file { "${staging}/${upload_file}":
       source  => "${upload_share}/${upload_file}",
       recurse => $upload_recursive,
-      before  => Exec[$name],
+      before  => Exec[postinstall],
     }
 
     if $upload_recursive {
@@ -50,6 +50,6 @@ class linux_postinstall(
 
   file { $exec_lck:
     ensure  => file,
-    require => Exec[$name],
+    require => Exec[postinstall],
   }
 }
