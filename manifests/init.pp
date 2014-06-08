@@ -1,7 +1,7 @@
 # Add support for postinstall file and script:
 class linux_postinstall(
   $install_packages = undef,
-  $upload_share     = 'puppet:///modules/linux_postinstall',
+  $upload_share     = undef,
   $upload_file      = undef,
   $upload_recursive = false,
   $execute_file_command,
@@ -9,6 +9,11 @@ class linux_postinstall(
 
   $path = "${vardir}/staging:${vardir}/staging/${file}:${::path}"
   $vardir = $::puppet_vardir
+  if $upload_share {
+    $mod_path = $upload_share
+  } else {
+    $mod_path = 'puppet:///modules/linux_postinstall'
+  }
 
   if $install_packages {
     $packages = split($install_packages, ',')
@@ -26,7 +31,7 @@ class linux_postinstall(
     }
 
     file { "${staging}/${upload_file}":
-      source  => "${upload_share}/${upload_file}",
+      source  => "${mod_path}/${upload_file}",
       recurse => $upload_recursive,
       before  => Exec[postinstall],
     }
