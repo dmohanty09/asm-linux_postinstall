@@ -5,6 +5,7 @@ class linux_postinstall(
   $upload_file      = undef,
   $upload_recursive = false,
   $execute_file_command,
+  $yum_proxy        = undef,
 ) {
 
   $path = "${vardir}/staging:${vardir}/staging/${file}:${::path}"
@@ -45,16 +46,27 @@ class linux_postinstall(
 
   $exec_lck = "${vardir}/postinstall.lck"
 
-  exec { postinstall:
-    command   => $execute_file_command,
-    path      => $path,
-    cwd       => $cwd,
-    creates   => $exec_lck,
-    logoutput => true,
-  }
+  if $execute_file_command{
+    exec { postinstall:
+      command   => $execute_file_command,
+      path      => $path,
+      cwd       => $cwd,
+      creates   => $exec_lck,
+      logoutput => true,
+    }
 
-  file { $exec_lck:
-    ensure  => file,
-    require => Exec[postinstall],
+    file { $exec_lck:
+      ensure  => file,
+      require => Exec[postinstall],
+    }
+  }
+  
+  if $yum_proxy {
+    file_line { yum_proxy :
+      ensure => present,
+      line   => "proxy=${yum_proxy}",
+      path   => '/etc/yum.conf',
+      before => Package[$packages],
+    }
   }
 }
