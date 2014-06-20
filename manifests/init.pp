@@ -1,11 +1,11 @@
 # Add support for postinstall file and script:
 class linux_postinstall(
-  $install_packages = undef,
-  $upload_share     = undef,
-  $upload_file      = undef,
-  $upload_recursive = false,
-  $execute_file_command,
-  $yum_proxy        = undef,
+  $install_packages     = undef,
+  $upload_share         = undef,
+  $upload_file          = undef,
+  $upload_recursive     = false,
+  $execute_file_command = undef,
+  $yum_proxy            = undef,
 ) {
 
   $path = "${vardir}/staging:${vardir}/staging/${file}:${::path}"
